@@ -1,21 +1,42 @@
-# GenetikaAI Suno — 3 Menu, Tanpa Login User
+# Studio Cover
 
-## API key pribadi
-- Jalankan aplikasi, lalu isi kolom **API Key pribadi** di halaman.
-- Key dikirim melalui header `X-API-Key` ke backend untuk setiap request create/status.
-- Key tidak ditanam di HTML, tidak ditulis ke `keys.txt`, dan tidak disimpan oleh aplikasi. Refresh halaman berarti perlu memasukkan ulang key.
-- Endpoint provider saat ini masih `https://api.emix.ai/api/v1`; masukkan API key yang memang berlaku untuk provider/endpoint tersebut. Mengganti key tidak otomatis mengganti provider.
-- Jangan membagikan API key atau memakai perangkat publik yang tidak dipercaya.
+Web generator Suno/Kling dengan halaman login. API key disimpan di server dan tidak dimasukkan pengguna ke halaman website. Setiap akun hanya memakai API key yang didaftarkan untuk akun tersebut.
 
-## Menu yang tersedia
-1. Generate Music
-2. Upload Cover Audio
-3. Upload Extend Cover
+## Cara mendaftarkan user di Vercel
+
+Buka **Project → Settings → Environment Variables**. `SESSION_SECRET` cukup satu untuk semua akun. Untuk setiap akun, tambahkan empat variabel:
+
+- `USER_1_USERNAME` — username login, misalnya `ADMINMOK`
+- `USER_1_PASSWORD` — password login
+- `USER_1_NAME` — nama tampilan, misalnya `Admin Mok`
+- `USER_1_API_KEY` — API key Emix milik akun itu
+
+User kedua gunakan `USER_2_USERNAME`, `USER_2_PASSWORD`, `USER_2_NAME`, `USER_2_API_KEY`. User ketiga gunakan prefix `USER_3_`, dan seterusnya sampai 200 slot. Nomor slot boleh berurutan, jangan pakai nomor yang sama untuk dua akun.
+
+`USER_n_API_KEY` bisa berisi satu API key atau beberapa key yang dipisahkan koma/baris baru. Kalau beberapa key dipakai, server mencoba key milik akun itu saja; tidak akan mengambil key user lain. Jangan gunakan API key global sebagai fallback untuk akun.
+
+Setelah mengubah Environment Variables, lakukan **Redeploy** di Vercel. Jangan memasukkan rahasia ke GitHub.
+
+## Sesi dan keamanan
+
+- `SESSION_SECRET` adalah rahasia acak panjang minimal 32 karakter dan cukup dibuat satu kali.
+- Login menggunakan username/password yang didaftarkan admin di Environment Variables; tidak ada pendaftaran publik.
+- Sesi berlaku 12 jam.
+- API key tetap server-side.
+- Untuk kompatibilitas, format lama `<USERNAME>_PASSWORD` dan `<USERNAME>_KEY_1` (atau `<USERNAME>_KEY`) masih didukung.
 
 ## Jalankan lokal
-- Node.js 18 atau lebih baru.
-- `npm install`
-- `npm start`
-- Buka `http://localhost:3000`
 
-Untuk Vercel, deploy project seperti biasa. Tidak perlu file `keys.txt` atau login user.
+1. Gunakan Node.js 18 atau lebih baru.
+2. Salin `.env.example` menjadi `.env`, lalu isi nilai rahasia sendiri.
+3. Jalankan `npm start` dan buka `http://localhost:3000`.
+
+
+## Format Environment Variables per akun (simple)
+
+- `USERNAME_PW`: password login akun tersebut.
+- `USERNAME_KEY_1`, `USERNAME_KEY_2`, ...: API key milik akun tersebut. Tambahkan nomor berikutnya untuk menambah key.
+- Alternatif nama key yang juga didukung: `USERNAME_APIKEY_1`, `USERNAME_APIKEY_2`, atau satu key `USERNAME_APIKEY`.
+- `SESSION_SECRET` tetap satu untuk semua akun dan digunakan untuk menandatangani sesi login.
+
+Contoh akun `AISYAH0865`: `AISYAH0865_PW`, `AISYAH0865_KEY_1`, `AISYAH0865_KEY_2`. Username login adalah `AISYAH0865`. Jika semua key milik akun itu habis/tidak valid, generate berhenti dan tidak memakai API key global atau milik user lain.
