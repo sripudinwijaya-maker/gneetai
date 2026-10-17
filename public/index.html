@@ -190,7 +190,7 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
       <div class="field" style="margin-bottom:16px">
         <label for="apiKey">API Key pribadi</label>
         <input type="password" id="apiKey" autocomplete="off" spellcheck="false" placeholder="Masukkan API key milik lo" required>
-        <div class="hint">API key dikirim langsung ke backend saat request dan tidak disimpan di halaman atau file keys.txt. Gunakan key dari provider yang sesuai dengan endpoint API.</div>
+        <div class="hint">API key dikirim langsung ke backend saat request dan tidak disimpan di halaman atau file keys.txt. Endpoint aktif: api.emix.ai. Key harus diterbitkan oleh Emix; key dari provider lain akan ditolak. Bisa tempel key mentah atau format Bearer key.</div>
       </div>
 
       <div class="field">
@@ -383,7 +383,7 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
 
   var ERR = {
     400: "Parameter tidak valid. Periksa isian form.",
-    401: "API key ditolak atau tidak valid. Periksa API key yang lo masukkan.",
+    401: "API key ditolak oleh Emix (HTTP 401). Pastikan key berasal dari akun Emix dan belum dicabut; key provider lain tidak bisa dipakai di endpoint ini.",
     402: "Saldo API key tidak cukup.",
     404: "Sumber tidak ditemukan.",
     422: "Validasi gagal. Periksa link audio dan isian lainnya.",
