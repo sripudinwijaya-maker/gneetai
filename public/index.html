@@ -156,16 +156,6 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
   button.go, button.go:hover:not(:disabled) { transition: none; transform: none; }
 }
 
-.login-wrap { width:min(440px, calc(100% - 28px)); margin:9vh auto 30px; }
-.login-panel { border:1px solid var(--line); border-radius:var(--radius); padding:clamp(22px,5vw,34px); background:var(--panel); box-shadow:0 20px 70px rgba(0,0,0,.28); backdrop-filter:var(--blur); }
-.login-panel h1 { font:700 clamp(24px,6vw,34px) var(--f-display); margin:0 0 8px; }
-.login-panel p { color:var(--muted); margin:0 0 22px; line-height:1.55; }
-.login-panel .field { margin:14px 0; }
-.login-panel input { width:100%; }
-.login-error { color:var(--rec); font-size:14px; min-height:20px; margin:10px 0; }
-.login-button { width:100%; border:0; border-radius:10px; padding:13px 16px; background:var(--accent); color:var(--accent-fg); font-weight:700; cursor:pointer; }
-.logout { border:1px solid var(--line); border-radius:999px; padding:8px 12px; color:var(--fg); background:var(--panel); cursor:pointer; }
-
 .suno-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:9px}
 .suno-menu-item{appearance:none;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:12px;border:1px solid var(--border,#303544);border-radius:12px;background:var(--panel2,#151925);color:inherit;cursor:pointer;min-height:90px}
 .suno-menu-item>span{font-size:21px}.suno-menu-item b{font-size:13px;line-height:1.25}.suno-menu-item small{font-size:11px;opacity:.72;line-height:1.35}
@@ -175,24 +165,13 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
 </style>
 </head>
 <body>
-<div class="login-wrap" id="loginWrap">
-  <form class="login-panel" id="loginForm">
-    <h1>Studio <span class="grad">Cover</span></h1>
-    <p>Login dulu untuk masuk ke halaman generate. Akun hanya bisa digunakan jika sudah didaftarkan oleh pemilik website.</p>
-    <div class="field"><label for="loginUsername">Username</label><input id="loginUsername" autocomplete="username" autocapitalize="off" required placeholder="Masukkan username"></div>
-    <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukkan password"></div>
-    <div class="login-error" id="loginError" role="status"></div>
-    <button class="login-button" id="loginButton" type="submit">Login</button>
-  </form>
-</div>
-<div class="wrap" id="app" hidden>
+<div class="wrap" id="app">
   <header class="top">
     <div>
       <h1>Studio <span class="grad">Cover</span></h1>
       <p class="sub">Unggah lagu referensi lewat link, pilih gaya baru, lalu biarkan AI menyanyikannya ulang sebagai cover.</p>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
-    <button type="button" class="logout" id="logoutButton">Keluar</button>
     <div class="themes" id="themes" role="group" aria-label="Tema tampilan">
       <button type="button" data-t="neon" style="--c1:#00e5ff;--c2:#ff3df0"><i></i>Neon</button>
       <button type="button" data-t="sunset" style="--c1:#ff8a4c;--c2:#ff3d77"><i></i>Sunset</button>
@@ -208,27 +187,20 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
     <form class="panel" id="form">
       <h2>Pengaturan lagu</h2>
 
-      <div class="hint" style="margin-bottom:16px">API terhubung otomatis menggunakan key akun yang disetel oleh pemilik.</div>
+      <div class="field" style="margin-bottom:16px">
+        <label for="apiKey">API Key pribadi</label>
+        <input type="password" id="apiKey" autocomplete="off" spellcheck="false" placeholder="Masukkan API key milik lo" required>
+        <div class="hint">API key dikirim langsung ke backend saat request dan tidak disimpan di halaman atau file keys.txt. Endpoint aktif: api.emix.ai. Key harus diterbitkan oleh Emix; key dari provider lain akan ditolak. Bisa tempel key mentah atau format Bearer key.</div>
+      </div>
 
       <div class="field">
         <label>Menu Suno</label>
         <div class="suno-menu" id="sunoMenu" role="group" aria-label="Pilih fitur Suno">
           <button type="button" class="suno-menu-item active" data-workflow="generate"><span>🎵</span><b>Generate Music</b><small>Buat lagu baru</small></button>
           <button type="button" class="suno-menu-item" data-workflow="cover"><span>🎧</span><b>Upload Cover Audio</b><small>Buat versi cover</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="extend"><span>⏩</span><b>Upload & Extend</b><small>Upload lalu lanjutkan lagu</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="extendExisting"><span>🎼</span><b>Extend Existing</b><small>Lanjutkan track Suno</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="addVocals"><span>🎤</span><b>Add Vocals</b><small>Tambahkan vokal</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="addInstrumental"><span>🎹</span><b>Add Instrumental</b><small>Tambahkan instrumental</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="replaceSection"><span>✂️</span><b>Replace Section</b><small>Ganti bagian lagu</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="boostStyle"><span>🎚️</span><b>Boost Music Style</b><small>Perkuat karakter gaya</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="musicCover"><span>🖼️</span><b>Generate Music Cover</b><small>Buat artwork cover</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="persona"><span>🧬</span><b>Generate Persona</b><small>Buat persona vokal</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="mashup"><span>🎛️</span><b>Mashup Music</b><small>Gabungkan materi musik</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="timestampedLyrics"><span>📝</span><b>Timestamped Lyrics</b><small>Lirik dengan timestamp</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="separateVocals"><span>🎙️</span><b>Separate Vocals / Stems</b><small>Pisahkan stem audio</small></button>
-          <button type="button" class="suno-menu-item" data-workflow="midi"><span>🎹</span><b>Generate MIDI</b><small>Audio ke MIDI</small></button>
+          <button type="button" class="suno-menu-item" data-workflow="extend"><span>⏩</span><b>Upload Extend Cover</b><small>Upload audio lalu lanjutkan sebagai cover</small></button>
         </div>
-        <select id="workflow" hidden aria-hidden="true"><option value="generate">Generate Music</option><option value="cover">Upload Cover Audio</option><option value="extend">Upload and Extend Audio</option><option value="extendExisting">Extend Existing Suno Track</option><option value="addVocals">Add Vocals</option><option value="addInstrumental">Add Instrumental</option><option value="replaceSection">Replace Section</option><option value="boostStyle">Boost Music Style</option><option value="musicCover">Generate Music Cover</option><option value="persona">Generate Persona</option><option value="mashup">Mashup Music</option><option value="timestampedLyrics">Timestamped Lyrics</option><option value="separateVocals">Separate Vocals / Stems</option><option value="midi">Generate MIDI from Audio</option></select>
+        <select id="workflow" hidden aria-hidden="true"><option value="generate">Generate Music</option><option value="cover">Upload Cover Audio</option><option value="extend">Upload Extend Cover</option></select>
         <div class="hint">Ketuk menu untuk membuka pengaturan fitur tersebut.</div>
       </div>
 
@@ -355,37 +327,12 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var timer = null, startedAt = 0;
-  var keyIndex = null, keyNote = "";
-  function getToken() { try { return sessionStorage.getItem("studio_auth_token") || ""; } catch (_) { return ""; } }
-  function setToken(v) { try { if (v) sessionStorage.setItem("studio_auth_token", v); else sessionStorage.removeItem("studio_auth_token"); } catch (_) {} }
+  var keyNote = "";
   function headers(json) {
-    var h = { "Authorization": "Bearer " + getToken() };
+    var h = { "X-API-Key": $("apiKey").value.trim() };
     if (json) h["Content-Type"] = "application/json";
     return h;
   }
-  function showApp(username) {
-    $("loginWrap").hidden = true; $("app").hidden = false;
-    var sub = document.querySelector(".sub"); if (sub) sub.textContent = "Login sebagai " + username + " · API key dikelola server.";
-  }
-  async function validateSession() {
-    var token = getToken(); if (!token) return;
-    try {
-      var r = await fetch("/api/info", { headers: headers(false) }); var j = await r.json();
-      if (r.ok && j.code === 200) showApp(j.username); else setToken("");
-    } catch (_) {}
-  }
-  $("loginForm").addEventListener("submit", async function (ev) {
-    ev.preventDefault(); $("loginButton").disabled = true; $("loginError").textContent = "Memeriksa akun…";
-    try {
-      var r = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ username:$("loginUsername").value.trim(), password:$("loginPassword").value }) });
-      var j = await r.json();
-      if (!r.ok || j.code !== 200 || !j.token) throw new Error(j.msg || "Login gagal.");
-      setToken(j.token); $("loginPassword").value = ""; $("loginError").textContent = ""; showApp(j.username);
-    } catch (e) { $("loginError").textContent = e.message || "Gagal login. Coba lagi."; }
-    finally { $("loginButton").disabled = false; }
-  });
-  $("logoutButton").addEventListener("click", function () { setToken(""); $("app").hidden = true; $("loginWrap").hidden = false; $("loginUsername").value = ""; $("loginPassword").value = ""; });
-  validateSession();
 
   // ---------- Form ----------
   function refreshWorkflow() {
@@ -401,7 +348,7 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
     $("voiceIdField").hidden = !["addVocals"].includes(w);
     $("startTime").required = w === "replaceSection"; $("endTime").required = w === "replaceSection";
     $("klingImageUrl").required = kling; $("klingVideoUrl").required = kling;
-    $("go").textContent = kling ? "Jalankan AI" : ({generate:"Generate Music",cover:"Upload Cover Audio",extend:"Upload and Extend Audio",extendExisting:"Extend Existing Track",addVocals:"Add Vocals",addInstrumental:"Add Instrumental",replaceSection:"Replace Section",boostStyle:"Boost Music Style",musicCover:"Generate Music Cover",persona:"Generate Persona",mashup:"Mashup Music",timestampedLyrics:"Timestamped Lyrics",separateVocals:"Separate Vocals / Stems",midi:"Generate MIDI"}[w] || "Jalankan Suno");
+    $("go").textContent = kling ? "Jalankan AI" : ({generate:"Generate Music",cover:"Upload Cover Audio",extend:"Upload Extend Cover"}[w] || "Jalankan Suno");
     $("model").disabled = kling;
     $("durationField").hidden = extend;
   }
@@ -436,7 +383,7 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
 
   var ERR = {
     400: "Parameter tidak valid. Periksa isian form.",
-    401: "Sesi login tidak valid atau API key ditolak. Login ulang atau hubungi pemilik akun.",
+    401: "API key ditolak oleh Emix (HTTP 401). Pastikan key berasal dari akun Emix dan belum dicabut; key provider lain tidak bisa dipakai di endpoint ini.",
     402: "Saldo API key tidak cukup.",
     404: "Sumber tidak ditemukan.",
     422: "Validasi gagal. Periksa link audio dan isian lainnya.",
@@ -530,7 +477,7 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
       if (busy) return; busy = true;
       var sec = Math.round((Date.now() - startedAt) / 1000);
       try {
-        var url = "/api/status?taskId=" + encodeURIComponent(taskId) + "&workflow=" + encodeURIComponent($("workflow").value) + (keyIndex !== null ? "&keyIndex=" + keyIndex : "");
+        var url = "/api/status?taskId=" + encodeURIComponent(taskId) + "&workflow=" + encodeURIComponent($("workflow").value);
         var r = await fetch(url, { headers: headers(false) });
         var j = await r.json();
         if (j.code !== 200) return fail(j.code, j.msg);
@@ -592,13 +539,13 @@ pre { overflow-x: auto; background: var(--input); border: 1px solid var(--line);
       if (j.code !== 200) {
         var detail = j.msg || j.providerMessage || "Permintaan gagal.";
         if (j.providerMessage && j.providerMessage !== detail) detail += " Detail: " + j.providerMessage;
-        if (j.source === "emix" && j.upstreamStatus) {
+        if (j.source === "provider" && j.upstreamStatus) {
           detail += " [Respons server AI HTTP " + j.upstreamStatus + "].";
         }
         if (j.code === 422) detail += " Periksa isian khusus untuk menu yang dipilih.";
         return fail(j.code, detail);
       }
-      keyIndex = Number.isInteger(j.userKeyIndex) ? j.userKeyIndex : 0; keyNote = "Memakai API key akun yang terdaftar.";
+      keyNote = "Memakai API key pribadi yang lo masukkan.";
       poll(j.data.taskId);
     } catch (e) { fail(0, e.message); }
   });
